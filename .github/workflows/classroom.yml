@@ -1,0 +1,36 @@
+name: Autograding Tests
+'on':
+  - push
+  - repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Install dependencies
+        run: |
+          pip install pytest
+          pip install numpy
+
+      - name: ContextManagers Test
+        id: contextmanagers
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: ContextManagers
+          command: pytest -vk "test_ContextManagers"
+          timeout: 20
+          max-score: 1
+    
+      - name: Autograding Reporter
+        uses: classroom-resources/autograding-grading-reporter@v1
+        env:
+          CONTEXTMANAGERS_RESULTS: "${{steps.contextmanagers.outputs.result}}"
+        with:
+          runners: contextmanagers
