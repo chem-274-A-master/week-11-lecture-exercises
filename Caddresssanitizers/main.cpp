@@ -4,15 +4,17 @@ Compile this code with the following flag:
 
 This flag will help in finding and fixing memory leaks. 
 
-Your goal is to identify all memory leaks and then correct them. 
-
-Hint: Pay close attention to dynamically allocated memory and how it's managed.
+Your goal is to identify all memory leaks and errors, and then correct them. 
 */
 
 #include <iostream>
 #include <vector>
 
 class Student {
+private:
+    std::string name_;
+    int age_;
+
 public:
     Student(const std::string &name, int age)
         : name_(name), age_(age) {}
@@ -21,20 +23,20 @@ public:
         std::cout << "Name: " << name_ << ", Age: " << age_ << std::endl;
     }
 
-private:
-    std::string name_;
-    int age_;
 };
 
 class Classroom {
+private:
+    std::vector<const Student*> students_;
+
 public:
     Classroom() {}
 
     ~Classroom() {
     }
 
-    void addStudent(const std::string &name, int age) {
-        students_.push_back(new Student(name, age));
+    void addStudent(const Student & s) {
+        students_.push_back(&s);
     }
 
     void displayStudents() const {
@@ -43,25 +45,26 @@ public:
         }
     }
 
-private:
-    std::vector<Student*> students_;
+    const Student & get_student(int i)
+    {
+        return *students_[i];
+    }
+
 };
 
 int main() {
     Classroom *class1 = new Classroom();
 
-    class1->addStudent("John", 20);
-    class1->addStudent("Jane", 21);
-
-    int *dynamicArray = new int[100];  
-
-    for (int i = 0; i < 100; i++) {
-        dynamicArray[i] = i;
-    }
+    Student * s1 = new Student("John", 20);
+    Student * s2 = new Student("Jane", 21);
+    class1->addStudent(*s1);
+    class1->addStudent(*s2);
 
     class1->displayStudents();
- 
-    Student* loneStudent = new Student("Lucas", 23);
+
+    // print the second student
+    class1->get_student(2).printInfo();
 
     return 0;
+
 }
