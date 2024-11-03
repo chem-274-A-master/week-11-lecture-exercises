@@ -27,10 +27,20 @@ jobs:
           command: pytest -vk "test_ContextManagers"
           timeout: 20
           max-score: 1
+
+      - name: CAddressSanitizers Test
+        id: caddresssanitizers
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: CAddressSanitizers
+          command: cd Caddresssanitizers && bash run_test.sh
+          timeout: 20
+          max-score: 1
     
       - name: Autograding Reporter
         uses: classroom-resources/autograding-grading-reporter@v1
         env:
           CONTEXTMANAGERS_RESULTS: "${{steps.contextmanagers.outputs.result}}"
+          CADDRESSSANITIZERS_RESULTS: "${{steps.caddresssanitizers.outputs.result}}"
         with:
-          runners: contextmanagers
+          runners: contextmanagers,caddresssanitizers
